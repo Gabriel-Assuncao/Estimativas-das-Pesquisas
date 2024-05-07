@@ -1,18 +1,69 @@
-# Limpando dados armazenados na memoria de programa
+##########################################################################
+
+# Limpando arquivos armazenados na memória
 rm(list=ls(all=TRUE))
 
-# Aumentando memoria atribuida para execucao do programa
-memory.limit(size=30000)
+# Definindo limite de memória para compilação do programa
+aviso <- getOption("warn")
+options(warn=-1)
+memory.limit(size=50000)
+options(warn=aviso)
+rm(aviso)
 
-# Carregando pacotes necessarios para calculo das estimativas
-library("PNSIBGE")
-library("survey")
+# Definindo tempo de espera para obtenção de resposta do servidor
+aviso <- getOption("warn")
+options(warn=-1)
+options(timeout=600)
+options(warn=aviso)
+rm(aviso)
 
-# Obtendo microdados e criando variaveis para calculo das estimativas
-pns2019_moradorselecionado <- get_pns(year=2019, selected=TRUE)
-pns2019_moradorselecionado$variables <- transform(pns2019_moradorselecionado$variables, Brasil=as.factor("Brasil"))
+# Definindo opção de codificação dos caracteres e linguagem
+aviso <- getOption("warn")
+options(warn=-1)
+options(encoding="latin1")
+options(warn=aviso)
+rm(aviso)
+
+# Definindo opção de exibição de números sem representação em exponencial
+aviso <- getOption("warn")
+options(warn=-1)
+options(scipen=999)
+options(warn=aviso)
+rm(aviso)
+
+# Definindo opção de repositório para instalação dos pacotes necessários
+aviso <- getOption("warn")
+options(warn=-1)
+options(repos=structure(c(CRAN="https://cran.r-project.org/")))
+options(warn=aviso)
+rm(aviso)
+
+# Definindo diretório de trabalho
+caminho <- getwd()
+setwd(dir=caminho)
+
+# Carregando pacotes necessários para obtenção da estimativa desejada
+if("PNSIBGE" %in% rownames(installed.packages())==FALSE)
+{
+  install.packages(pkgs="PNSIBGE", dependencies=TRUE)
+}
+library(package="PNSIBGE", verbose=TRUE)
+if("survey" %in% rownames(installed.packages())==FALSE)
+{
+  install.packages(pkgs="survey", dependencies=TRUE)
+}
+library(package="survey", verbose=TRUE)
+
+# Obtendo microdados do período de referência para cálculo da estimativa
+pns2019_moradorselecionado <- PNSIBGE::get_pns(year=2019, selected=TRUE)
+
+# Criando variáveis auxiliares para cálculo da estimativa
+pns2019_moradorselecionado$variables <- transform(pns2019_moradorselecionado$variables, Pais=as.factor("Brasil"))
+pns2019_moradorselecionado$variables$Pais <- factor(pns2019_moradorselecionado$variables$Pais, levels=c("Brasil"))
 pns2019_moradorselecionado$variables <- transform(pns2019_moradorselecionado$variables, GR=as.factor(ifelse(substr(x=UPA_PNS,start=1,stop=1)=="1","Norte",ifelse(substr(x=UPA_PNS,start=1,stop=1)=="2","Nordeste",ifelse(substr(x=UPA_PNS,start=1,stop=1)=="3","Sudeste",ifelse(substr(x=UPA_PNS,start=1,stop=1)=="4","Sul",ifelse(substr(x=UPA_PNS,start=1,stop=1)=="5","Centro-oeste",NA)))))))
 pns2019_moradorselecionado$variables$GR <- factor(pns2019_moradorselecionado$variables$GR, levels=c("Norte","Nordeste","Sudeste","Sul","Centro-oeste"))
+
+# Criando variáveis de tempo relacionadas à atividade física e lazer
 pns2019_moradorselecionado$variables <- transform(pns2019_moradorselecionado$variables, NP04001=ifelse(is.na(P04001) | P04001==9,0,as.integer(P04001)))
 pns2019_moradorselecionado$variables <- transform(pns2019_moradorselecionado$variables, NP04101=ifelse(is.na(P04101) | P04101==99,0,as.integer(P04101)))
 pns2019_moradorselecionado$variables <- transform(pns2019_moradorselecionado$variables, NP04102=ifelse(is.na(P04102) | P04102==99,0,as.integer(P04102)))
@@ -30,10 +81,12 @@ pns2019_moradorselecionado$variables <- transform(pns2019_moradorselecionado$var
 pns2019_moradorselecionado$variables <- transform(pns2019_moradorselecionado$variables, NP04302=ifelse(is.na(P04302) | P04302==99,0,as.integer(P04302)))
 pns2019_moradorselecionado$variables <- transform(pns2019_moradorselecionado$variables, tempo_deslocamento_atividade_habitual=NP042*(NP04301*60+NP04302))
 
-# Calculando estimativa de pessoas de 15 anos ou mais insuficientemente ativos (SIDRA: 7740)
-print(x=insuficientemente_ativo_total <- svybys(formula=~as.integer(((tempo_deslocamento_trabalho)+(tempo_lazer_semana)+(tempo_trabalho)+(tempo_deslocamento_atividade_habitual))<150), bys=~Brasil+GR, design=subset(pns2019_moradorselecionado, C008>=18 & C008<999), FUN=svytotal, vartype=c("se","cv"), keep.names=FALSE, na.rm=TRUE))
-print(x=insuficientemente_ativo_percentual <- svybys(formula=~as.integer(((tempo_deslocamento_trabalho)+(tempo_lazer_semana)+(tempo_trabalho)+(tempo_deslocamento_atividade_habitual))<150), bys=~Brasil+GR, design=subset(pns2019_moradorselecionado, C008>=18 & C008<999), FUN=svymean, vartype=c("se","cv"), keep.names=FALSE, na.rm=TRUE))
+# Calculando estimativa de pessoas de 18 anos ou mais insuficientemente ativos (SIDRA - Tabela 7740)
+print(x=total_insuficientemente_ativo <- survey::svybys(formula=~as.integer(((tempo_deslocamento_trabalho)+(tempo_lazer_semana)+(tempo_trabalho)+(tempo_deslocamento_atividade_habitual))<150), bys=~Pais+GR, design=subset(pns2019_moradorselecionado, C008>=18 & C008<999), FUN=svytotal, vartype=c("se","cv"), keep.names=FALSE, na.rm=TRUE))
+print(x=proporcao_insuficientemente_ativo <- survey::svybys(formula=~as.integer(((tempo_deslocamento_trabalho)+(tempo_lazer_semana)+(tempo_trabalho)+(tempo_deslocamento_atividade_habitual))<150), bys=~Pais+GR, design=subset(pns2019_moradorselecionado, C008>=18 & C008<999), FUN=svymean, vartype=c("se","cv"), keep.names=FALSE, na.rm=TRUE))
 
-# Calculando estimativa de pessoas de 15 anos ou mais que praticam o nivel recomendado de atividade fisica no lazer (SIDRA: 4250)
-print(x=atividade_fisica_lazer_total <- svybys(formula=~as.integer(tempo_lazer_semana>=150), bys=~Brasil+GR, design=subset(pns2019_moradorselecionado, C008>=18 & C008<999), FUN=svytotal, vartype=c("se","cv"), keep.names=FALSE, na.rm=TRUE))
-print(x=atividade_fisica_lazer_percentual <- svybys(formula=~as.integer(tempo_lazer_semana>=150), bys=~Brasil+GR, design=subset(pns2019_moradorselecionado, C008>=18 & C008<999), FUN=svymean, vartype=c("se","cv"), keep.names=FALSE, na.rm=TRUE))
+# Calculando estimativa de pessoas de 18 anos ou mais que praticam o nível recomendado de atividade física no lazer (SIDRA - Tabela 4250)
+print(x=total_atividade_fisica_lazer <- survey::svybys(formula=~as.integer(tempo_lazer_semana>=150), bys=~Pais+GR, design=subset(pns2019_moradorselecionado, C008>=18 & C008<999), FUN=svytotal, vartype=c("se","cv"), keep.names=FALSE, na.rm=TRUE))
+print(x=proporcao_atividade_fisica_lazer <- survey::svybys(formula=~as.integer(tempo_lazer_semana>=150), bys=~Pais+GR, design=subset(pns2019_moradorselecionado, C008>=18 & C008<999), FUN=svymean, vartype=c("se","cv"), keep.names=FALSE, na.rm=TRUE))
+
+##########################################################################
