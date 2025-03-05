@@ -61,6 +61,8 @@ library(package="utils", verbose=TRUE)
 
 # Obtendo microdados do período de referência para cálculo da estimativa
 pnadc_trimestral <- PNADcIBGE::get_pnadc(year=2022, quarter=2)
+
+# Criando variável com indicação de informalidade na ocupação
 pnadc_trimestral$variables <- transform(pnadc_trimestral$variables, informalidade=as.factor(ifelse(is.na(VD4009),NA,ifelse(VD4009=="Empregado no setor privado sem carteira de trabalho assinada"|VD4009=="Trabalhador doméstico sem carteira de trabalho assinada"|(VD4009=="Empregador"&V4019=="Não")|(VD4009=="Conta-própria"&V4019=="Não")|VD4009=="Trabalhador familiar auxiliar","Pessoas na informalidade","Pessoas na formalidade"))))
 
 # Calculando estimativa do total de pessoas na informalidade (SIDRA - Tabela 8517)
