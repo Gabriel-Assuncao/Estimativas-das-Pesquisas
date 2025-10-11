@@ -59,6 +59,7 @@ variaveis_selecionadas <- c("V1022","V2005","V2009",sprintf("S170%02d", seq(1:14
 pnadc_anual_trimestre <- PNADcIBGE::get_pnadc(year=2023, topic=4, vars=variaveis_selecionadas)
 
 # Criando variáveis auxiliares para cálculo da estimativa
+pnadc_anual_trimestre$variables <- transform(pnadc_anual_trimestre$variables, ID_DOMICILIO=paste0(UPA,V1008,V1014))
 pnadc_anual_trimestre$variables <- transform(pnadc_anual_trimestre$variables, Pais=as.factor("Brasil"))
 pnadc_anual_trimestre$variables$Pais <- factor(x=pnadc_anual_trimestre$variables$Pais, levels=c("Brasil"))
 pnadc_anual_trimestre$variables <- transform(pnadc_anual_trimestre$variables, GR=as.factor(ifelse(substr(UPA, start=1, stop=1)=="1","Norte",ifelse(substr(UPA, start=1, stop=1)=="2","Nordeste",ifelse(substr(UPA, start=1, stop=1)=="3","Sudeste",ifelse(substr(UPA, start=1, stop=1)=="4","Sul",ifelse(substr(UPA, start=1, stop=1)=="5","Centro-Oeste",NA)))))))
