@@ -81,7 +81,11 @@ if(sum(is.na(pnadc_anual_trimestre$variables$SD17001)) == nrow(pnadc_anual_trime
 }
 
 # Calculando total e proporção de domicílios de acordo com segurança alimentar (SIDRA - Tabela 9552)
-print(x=total_seguranca_alimentar <- survey::svybys(formula=~SD17001, bys=~Pais+GR+V1022, design=subset(pnadc_anual_trimestre, V2005=="Pessoa responsável pelo domicílio"), FUN=svytotal, vartype=c("se","cv"), keep.names=FALSE, na.rm=TRUE))
-print(x=proporcao_seguranca_alimentar <- survey::svybys(formula=~SD17001, bys=~Pais+GR+V1022, design=subset(pnadc_anual_trimestre, V2005=="Pessoa responsável pelo domicílio"), FUN=svymean, vartype=c("se","cv"), keep.names=FALSE, na.rm=TRUE))
+print(x=domicilios_total_seguranca_alimentar <- survey::svybys(formula=~SD17001, bys=~Pais+GR+V1022, design=subset(pnadc_anual_trimestre, V2005=="Pessoa responsável pelo domicílio"), FUN=svytotal, vartype=c("se","cv"), keep.names=FALSE, na.rm=TRUE))
+print(x=domicilios_proporcao_seguranca_alimentar <- survey::svybys(formula=~SD17001, bys=~Pais+GR+V1022, design=subset(pnadc_anual_trimestre, V2005=="Pessoa responsável pelo domicílio"), FUN=svymean, vartype=c("se","cv"), keep.names=FALSE, na.rm=TRUE))
+
+# Calculando total e proporção de moradores de acordo com segurança alimentar (SIDRA - Tabela 9552)
+print(x=moradores_total_seguranca_alimentar <- survey::svybys(formula=~SD17001, bys=~Pais+GR+V1022, design=pnadc_anual_trimestre, FUN=svytotal, vartype=c("se","cv"), keep.names=FALSE, na.rm=TRUE))
+print(x=moradores_proporcao_seguranca_alimentar <- survey::svybys(formula=~SD17001, bys=~Pais+GR+V1022, design=pnadc_anual_trimestre, FUN=svymean, vartype=c("se","cv"), keep.names=FALSE, na.rm=TRUE))
 
 ##########################################################################
