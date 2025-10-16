@@ -83,7 +83,7 @@ if(sum(is.na(pnadc_anual_trimestre$variables$SD14001)) == nrow(pnadc_anual_trime
 }
 
 # Calculando estimativa do total de pessoas que realizou trabalho por meio de plataforma digital (SIDRA - Tabela 9432)
-print(x=trabalho_plataforma_digital <- survey::svytotal(x=~SD14001, design=subset(pnadc_anual_trimestre, V2009>=14 & V2009<999), na.rm=TRUE))
+print(x=trabalho_plataforma_digital <- survey::svytotal(x=~as.integer(!is.na(SD14001))+SD14001, design=subset(pnadc_anual_trimestre, V2009>=14 & V2009<999), na.rm=TRUE))
 cv(object=trabalho_plataforma_digital)
 
 ##########################################################################
