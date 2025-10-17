@@ -1,5 +1,5 @@
 ##########################################################################
-
+#
 # Limpando arquivos armazenados na memória
 rm(list=ls(all=TRUE))
 
@@ -87,3 +87,4 @@ print(x=trabalho_plataforma_digital <- survey::svytotal(x=~as.integer(!is.na(SD1
 cv(object=trabalho_plataforma_digital)
 
 ##########################################################################
+
