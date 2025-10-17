@@ -1,5 +1,5 @@
 ##########################################################################
-#
+
 # Limpando arquivos armazenados na memória
 rm(list=ls(all=TRUE))
 
@@ -89,4 +89,3 @@ print(x=moradores_total_seguranca_alimentar <- survey::svybys(formula=~SD17001, 
 print(x=moradores_proporcao_seguranca_alimentar <- survey::svybys(formula=~SD17001, bys=~Pais+GR+V1022, design=pnadc_anual_trimestre, FUN=svymean, vartype=c("se","cv"), keep.names=FALSE, na.rm=TRUE))
 
 ##########################################################################
-
