@@ -74,7 +74,7 @@ pnadc_anual_trimestre$variables <- transform(pnadc_anual_trimestre$variables, MS
                                                                                                               ifelse(NS17001>=1 & NS17001<=3,"Insegurança alimentar leve",ifelse(NS17001>=4 & NS17001<=5,"Insegurança alimentar moderada",ifelse(NS17001>=6 & NS17001<=8,"Insegurança alimentar grave",NA)))))))
 pnadc_anual_trimestre$variables$MS17001 <- factor(x=pnadc_anual_trimestre$variables$MS17001, levels=c("Segurança alimentar","Insegurança alimentar leve","Insegurança alimentar moderada","Insegurança alimentar grave"))
 rm(domicilios_com_menores)
-if(sum(is.na(pnadc_anual_trimestre$variables$SD17001)) == nrow(pnadc_anual_trimestre$variables))
+if(sum(is.na(pnadc_anual_trimestre$variables$SD17001)) == nrow(pnadc_anual_trimestre$variables) | is.null(pnadc_anual_trimestre$variables$SD17001))
 {
   pnadc_anual_trimestre$variables <- transform(pnadc_anual_trimestre$variables, SD17001=as.factor(ifelse(is.na(MS17001),NA,as.character(MS17001))))
   pnadc_anual_trimestre$variables$SD17001 <- factor(x=pnadc_anual_trimestre$variables$SD17001, levels=c("Segurança alimentar","Insegurança alimentar leve","Insegurança alimentar moderada","Insegurança alimentar grave"))
