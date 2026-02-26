@@ -55,7 +55,7 @@ if("survey" %in% rownames(installed.packages())==FALSE)
 library(package="survey", verbose=TRUE)
 
 # Obtendo microdados do período de referência para cálculo da estimativa
-ano <- 2024
+ano <- 2023
 {
   if(ano == 2019)
   {
